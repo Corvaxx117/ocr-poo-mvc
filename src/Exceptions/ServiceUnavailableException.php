@@ -2,8 +2,13 @@
 
 namespace App\Exceptions;
 
-class ServiceUnavailableException extends \Exception
+class ServiceUnavailableException extends \Exception implements HttpExceptionInterface
 {
-    protected $code = 503;
-    protected $message = "Service temporairement indisponible.";
+    protected int $statusCode = 503;
+    protected string $message = "Service temporairement indisponible.";
+
+    public function getStatusCode(): int
+    {
+        return $this->statusCode;
+    }
 }

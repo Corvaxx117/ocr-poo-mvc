@@ -2,8 +2,13 @@
 
 namespace App\Exceptions;
 
-class ConflictException extends \Exception
+class ConflictException extends \Exception implements HttpExceptionInterface
 {
-    protected $code = 409;
-    protected $message = "Conflit avec une ressource existante.";
+    protected int $statusCode = 409;
+    protected string $message = "Conflit avec une ressource existante.";
+
+    public function getStatusCode(): int
+    {
+        return $this->statusCode;
+    }
 }

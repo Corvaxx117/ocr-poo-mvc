@@ -2,8 +2,13 @@
 
 namespace App\Exceptions;
 
-class UnsupportedMediaTypeException extends \Exception
+class UnsupportedMediaTypeException extends \Exception implements HttpExceptionInterface
 {
-    protected $code = 415;
-    protected $message = "Type de contenu non pris en charge.";
+    protected int $statusCode = 415;
+    protected string $message = "Type de contenu non pris en charge.";
+
+    public function getStatusCode(): int
+    {
+        return $this->statusCode; 
+    }
 }

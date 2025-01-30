@@ -2,8 +2,13 @@
 
 namespace App\Exceptions;
 
-class UnauthorizedException extends \Exception
+class UnauthorizedException extends \Exception implements HttpExceptionInterface
 {
-    protected $code = 401;
-    protected $message = "Authentification requise.";
+    protected int $statusCode = 401;
+    protected string $message = "Authentification requise.";
+
+    public function getstatusCode(): int
+    {
+        return $this->statusCode;
+    }
 }
