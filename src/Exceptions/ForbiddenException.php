@@ -2,8 +2,13 @@
 
 namespace App\Exceptions;
 
-class ForbiddenException extends \Exception
+class ForbiddenException extends \Exception implements HttpExceptionInterface
 {
-    protected $code = 403;
-    protected $message = "Accès interdit.";
+    protected int $statusCode = 403;
+    protected string $message = "Accès interdit.";
+    
+    public function getStatusCode(): int
+    {
+        return $this->statusCode;
+    }
 }
