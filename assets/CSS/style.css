@@ -180,7 +180,7 @@ main {
 }
 
 .hover-effect:hover {
-    background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(181, 15, 87, 0.751), var(--headerColor));
+    background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(165, 55, 0, 0.688), var(--headerColor));
 }
 
 .hover-link {
@@ -196,7 +196,7 @@ main {
 }
 
 .hover-link:hover {
-    color: var(--dateColor);
+    color: var(--commentColor);
     transform: scale(1.1);
 }
 
@@ -427,6 +427,16 @@ a.info {
     margin: 20px;
     color: var(--headerColor);
     font-weight: bold;
+}
+
+/**
+ ********************** Partie Connexion **********************
+ */
+
+.redirect-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 /**
@@ -802,6 +812,7 @@ a.info {
 /**
  * ********************* Details d'un article *********************
  */
+
 .container-over-links {
     display: flex;
     justify-content: space-between; 
