@@ -44,9 +44,7 @@ class ArticleController
         // Récupération de l'id de l'article demandé.
         $article = $this->articleModel->getArticleById($id);
         if (!$article) {
-            $this->viewRenderer->addFlash('error', "L'article demandé n'existe pas.");
-            header('Location: ' . $this->viewRenderer->url('/articles'));
-            exit;
+            $this->viewRenderer->redirectWithFlash('/articles', 'error', "L'article demandé n'existe pas.");
         }
 
         // Incrémente le nombre de vues

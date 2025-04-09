@@ -9,14 +9,18 @@ namespace App\Controller;
 use App\Model\UserModel;
 use App\Services\ViewRenderer;
 use App\Services\AuthService;
+use App\Services\FlashMessage;
 
 class UserController
 {
+
     private UserModel $userModel;
+    private FlashMessage $flashMessage;
 
     public function __construct(private ViewRenderer $viewRenderer)
     {
         $this->userModel = new UserModel();
+        $this->flashMessage = new FlashMessage();
     }
 
     /**
@@ -32,18 +36,18 @@ class UserController
 
     /**
      * Redirige vers la page de connexion si l'utilisateur n'est pas connecté.
+     * @return void
      */
     private function ensureAuthenticated(): void
     {
         if (!$this->getCurrentUserId()) {
-            $this->viewRenderer->addFlash('error', "Vous devez être connecté pour accéder à cette page.");
-            header('Location: ' . $this->viewRenderer->url('/auth/connectionForm'));
-            exit;
+            $this->viewRenderer->redirectWithFlash('/auth/connection', 'error', "Vous devez être connecté pour accéder à cette page.");
         }
     }
 
+
     /**
-     * Affiche les informations de l'utilisateur connecté.
+     * Affiche le profil de l'utilisateur connecté.
      * @return void
      */
     public function profile(): void
@@ -53,16 +57,13 @@ class UserController
         $user = $this->userModel->findUserById($userId);
 
         if (!$user) {
-            $this->viewRenderer->addFlash('error', "Utilisateur introuvable.");
-            header('Location: ' . $this->viewRenderer->url('/articles'));
-            exit;
+            $this->viewRenderer->redirectWithFlash('/auth/connection', 'error', "Utilisateur introuvable.");
         }
 
-        $data = [
-            'title' => 'Mon profil',
-            'user' => $user
-        ];
-        $this->viewRenderer->render('../views/users/profile.phtml', $data);
+        $this->viewRenderer->render('../views/users/profile.phtml', [
+            'user' => $user,
+            'title' => 'Mon profil'
+        ]);
     }
 
     /**
@@ -76,16 +77,13 @@ class UserController
         $user = $this->userModel->findUserById($userId);
 
         if (!$user) {
-            $this->viewRenderer->addFlash('error', "Utilisateur introuvable.");
-            header('Location: ' . $this->viewRenderer->url('/auth/connectionForm'));
-            exit;
+            $this->viewRenderer->redirectWithFlash('/auth/connection', 'error', "Utilisateur introuvable.");
         }
 
-        $data = [
-            'title' => 'Modifier mon profil',
-            'user' => $user
-        ];
-        $this->viewRenderer->render('../views/users/edit.phtml', $data);
+        $this->viewRenderer->render('../views/users/edit.phtml', [
+            'user' => $user,
+            'title' => 'Modifier mon profil'
+        ]);
     }
 
     /**
@@ -100,28 +98,35 @@ class UserController
             $userId = $this->getCurrentUserId();
             $nickname = trim($_POST['nickname']);
             $email = trim($_POST['email']);
+            $password = trim($_POST['password']);
+            $confirmPassword = trim($_POST['confirm_password']);
 
-            if (empty($nickname)) {
-                $this->viewRenderer->addFlash('error', "Le pseudonyme est requis.");
+            if (empty($nickname || $password || $email)) {
+                $this->viewRenderer->addFlash('error', "Tous les champs sont requis.");
             }
 
-            if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $this->viewRenderer->addFlash('error', "Veuillez saisir un email valide.");
             }
 
+            if (!($password === $confirmPassword)) {
+                $this->viewRenderer->addFlash('error', "Les mots de passe ne correspondent pas.");
+            }
+
             if ($this->viewRenderer->hasFlash('error')) {
-                header('Location: ' . $this->viewRenderer->url('/users/editProfile'));
+                $this->flashMessage->addFlash('error', implode(' / ', $this->flashMessage->getFlash('error')));
+                $this->viewRenderer->render('/users/edit.phtml');
                 exit;
             }
 
             $this->userModel->updateUser($userId, [
                 'nickname' => $nickname,
                 'email' => $email,
+                'password' => password_hash($password, PASSWORD_DEFAULT)
             ]);
 
             $this->viewRenderer->addFlash('success', "Profil mis à jour avec succès.");
-            header('Location: ' . $this->viewRenderer->url('/users/profile'));
-            exit;
+            $this->profile();
         }
     }
 
@@ -137,22 +142,18 @@ class UserController
 
         if (!$user) {
             $this->viewRenderer->addFlash('error', "Utilisateur introuvable.");
-            header('Location: ' . $this->viewRenderer->url('/users/profile'));
-            exit;
+            $this->viewRenderer->render('/auth/connection_form.phtml');
         }
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($this->userModel->deleteUser($userId)) {
                 // Déconnecte l'utilisateur après suppression
                 AuthService::logout();
-                $this->viewRenderer->addFlash('success', "Votre compte a été supprimé.");
-                header('Location: ' . $this->viewRenderer->url('/articles'));
-                exit;
+                $this->viewRenderer->redirectWithFlash('/articles', 'success', "Votre compte a été supprimé.");
             }
         }
 
         $this->viewRenderer->addFlash('error', "Impossible de supprimer votre compte.");
-        header('Location: ' . $this->viewRenderer->url('/users/profile'));
-        exit;
+        $this->viewRenderer->render('/users/profile.phtml');
     }
 }

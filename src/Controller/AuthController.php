@@ -5,87 +5,88 @@ namespace App\Controller;
 use App\Model\UserModel;
 use App\Services\ViewRenderer;
 use App\Services\AuthService;
+use App\Services\FlashMessage;
 
 class AuthController
 {
     private UserModel $userModel;
+    private FlashMessage $flashMessage;
     public function __construct(private ViewRenderer $viewRenderer)
     {
         $this->userModel = new UserModel();
+        $this->flashMessage = new FlashMessage();
     }
 
     /**
-     * Affichage du formulaire de connexion administrateur.
-     * @return void
+     * Affichage du formulaire d'inscription. (GET)
+     * Inscription de l'utilisateur. (POST)
      */
-    public function displayRegistrationForm(): void
-    {
-        $this->viewRenderer->render('auth/registration_form.phtml');
-    }
-
-    /**
-     * Inscription de l'utilisateur.
-     * @return void
-     */
-
     public function register(): void
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $nickname = trim($_POST['nickname'] ?? '');
-            $email = trim($_POST['email'] ?? '');
-            $password = trim($_POST['password'] ?? '');
-            $confirmPassword = trim($_POST['confirm_password'] ?? '');
+            $result = $this->verifyFormRegister();
 
-            if (empty($nickname) || empty($email) || empty($password) || empty($confirmPassword)) {
-                $this->viewRenderer->addFlash('error', "Tous les champs sont obligatoires.");
-                header('Location: ' . $this->viewRenderer->url('auth/registrationForm'));
-                exit;
+            if (!empty($result['errors'])) {
+                // Rediriger avec les erreurs si elles existent
+                $this->flashMessage->addFlash('error', implode(' / ', $result['errors']));
+                $this->viewRenderer->render('auth/registration_form.phtml');
+                return;
             }
-
-            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $this->viewRenderer->addFlash('error', "Veuillez saisir un email valide.");
-                header('Location: ' . $this->viewRenderer->url('auth/registrationForm'));
-                exit;
-            }
-
-            if ($password !== $confirmPassword) {
-                $this->viewRenderer->addFlash('error', "Les mots de passe ne correspondent pas.");
-                header('Location: ' . $this->viewRenderer->url('auth/registrationForm'));
-                exit;
-            }
-
-            // Vérification utilisateur
-            $user = $this->userModel->findUserByEmail($email);
-            if ($user) {
-                $this->viewRenderer->addFlash('error', "Un utilisateur avec cet email existe deja.");
-                header('Location: ' . $this->viewRenderer->url('auth/registrationForm'));
-                exit;
-            }
-            $data = [
-                'nickname' => $nickname,
-                'email' => $email,
-                'password' => password_hash($password, PASSWORD_DEFAULT)
-            ];
 
             // Création de l'utilisateur
-            $this->userModel->createUser($data);
+            $this->userModel->createUser($result['data']);
 
-            $this->viewRenderer->addFlash('success', "Inscription réussie.");
-            header('Location: ' . $this->viewRenderer->url('auth/connectionForm'));
-            exit;
+            // Ajouter un message de succès
+            $this->flashMessage->addFlash('success', "Inscription réussie.");
+            $this->viewRenderer->render('auth/connection_form.phtml');
+        } else {
+            $this->viewRenderer->render('auth/registration_form.phtml');
         }
     }
 
     /**
-     * Affichage du formulaire de connexion administrateur.
+     * Verifie le formulaire d'inscription
+     * @return array Retourne les erreurs et les données validées
      */
-    public function displayConnectionForm(): void
+    private function verifyFormRegister(): array
     {
-        $this->viewRenderer->render('auth/connection_form.phtml');
+        $nickname = trim($_POST['nickname'] ?? '');
+        $email = trim($_POST['email'] ?? '');
+        $password = trim($_POST['password'] ?? '');
+        $confirmPassword = trim($_POST['confirm_password'] ?? '');
+
+        if (empty($nickname) || empty($email) || empty($password) || empty($confirmPassword)) {
+            $this->flashMessage->addFlash('error', "Tous les champs sont obligatoires.");
+        }
+
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $this->flashMessage->addFlash('error', "Veuillez saisir un email valide.");
+        }
+
+        if ($password !== $confirmPassword) {
+            $this->flashMessage->addFlash('error', "Les mots de passe ne correspondent pas.");
+        }
+
+        // Vérification utilisateur
+        $user = $this->userModel->findUserByEmail($email);
+        if ($user) {
+            $this->flashMessage->addFlash('error', "Un utilisateur avec cet email existe deja.");
+        }
+
+        return [
+            'errors' => $this->flashMessage->getFlash('error'),
+            'data' => empty($this->flashMessage->getFlash('error')) ? [ // Seulement si aucune erreur
+                'nickname' => $nickname,
+                'email' => $email,
+                'password' => password_hash($password, PASSWORD_DEFAULT)
+            ] : null
+        ];
     }
 
     /**
-     * Connexion de l'utilisateur en tant qu'administrateur.
+     * Affichage du formulaire de connexion administrateur. (GET)
+     * Connexion de l'utilisateur en tant qu'administrateur. (POST)
+     * @return void
      */
     public function connect(): void
     {
@@ -94,31 +95,32 @@ class AuthController
             $password = trim($_POST['password'] ?? '');
 
             if (empty($email) || empty($password)) {
-                $this->viewRenderer->addFlash('error', "Tous les champs sont obligatoires.");
-                header('Location: ' . $this->viewRenderer->url('auth/connectionForm'));
-                exit;
+                $this->flashMessage->addFlash('error', "Tous les champs sont obligatoires.");
             }
 
             if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-                $this->viewRenderer->addFlash('error', "Veuillez saisir un email valide.");
-                header('Location: ' . $this->viewRenderer->url('auth/connectionForm'));
-                exit;
+                $this->flashMessage->addFlash('error', "Veuillez saisir un email valide.");
             }
 
             // Vérification utilisateur
             $user = $this->userModel->findUserByEmail($email);
             if (!$user || !password_verify($password, $user['password'])) {
-                $this->viewRenderer->addFlash('error', "Identifiants incorrects.");
-                header('Location: ' . $this->viewRenderer->url('auth/connectionForm'));
-                exit;
+                $this->flashMessage->addFlash('error', "Email ou mot de passe incorrect.");
             }
 
+            if ($this->viewRenderer->hasFlash('error')) {
+                // Rediriger avec les erreurs si elles existent
+                $this->flashMessage->addFlash('error', implode(' / ', $this->flashMessage->getFlash('error')));
+                $this->viewRenderer->render('auth/connection_form.phtml');
+                return;
+            }
             // Connexion de l'utilisateur
             AuthService::login($user);
 
-            $this->viewRenderer->addFlash('success', "Connexion réussie.");
             header('Location: ' . $this->viewRenderer->url('/articles'));
             exit;
+        } else {
+            $this->viewRenderer->render('auth/connection_form.phtml');
         }
     }
 
@@ -128,7 +130,6 @@ class AuthController
     public function disconnect(): void
     {
         AuthService::logout();
-        $this->viewRenderer->addFlash('warning', "Vous êtes maintenant déconnecté.");
         header('Location: ' . $this->viewRenderer->url('/articles'));
         exit;
     }

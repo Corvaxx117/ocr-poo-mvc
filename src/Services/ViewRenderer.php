@@ -89,4 +89,22 @@ class ViewRenderer
 
         return $newOrder;
     }
+
+    /**
+     * Redirige avec un message flash stocké dans l'URL.
+     * @param string $url L'URL de redirection.
+     * @param string $type Le type de message flash (success, error, warning).
+     * @param string $message Le message flash.
+     * @return void
+     */
+    public function redirectWithFlash(string $url, string $type, string $message): void
+    {
+        $this->flashMessage->addFlash($type, $message);
+
+        // Rendre une page de transition avec redirection via JavaScript
+        $this->render('flashMessages/redirect.phtml', [
+            'redirectUrl' => $this->url($url)
+        ]);
+        exit;
+    }
 }

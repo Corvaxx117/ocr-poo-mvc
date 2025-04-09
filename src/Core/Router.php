@@ -13,6 +13,8 @@ use Symfony\Component\Yaml\Yaml;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\InternalServerErrorException;
 
+use function PHPUnit\Framework\assertIsArray;
+
 class Router
 {
     private array $routes;
@@ -35,11 +37,17 @@ class Router
             // '/' est un délimiteur en regexp, on échappe donc '/' par '\/' grace a str_replace
             $pattern = preg_replace('/:\w+/', '(\w+)', str_replace('/', '\/', $route));
 
+            if (is_array($config['method'])) {
+                $routeMethods = $config['method'];
+            } else {
+                $routeMethods = [$config['method']];
+            }
+
             // $matches contient tous les paramètres extrait de l'URI
             // arguments de pregmatch optionnel passé par référence (alimenté directement par cette fonction )
             // le preg_match permet de tester si l'url de la requête correspond bien à une route
             // il alimente $matches avec toutes les valeurs variable de la route par rapport à l'url
-            if (preg_match('/^' . $pattern . '$/', $uri, $matches) && $method === $config['method']) {
+            if (in_array($method, $routeMethods) && preg_match('/^' . $pattern . '$/', $uri, $matches)) {
                 // $matches[0] contiendra toujours ce que l'expression reguliere valide dans sa totalité, 
                 // la ou les index suivant contiendront seulement ce qui est capturé 
                 // (par capture j'entends les parenthèse de la regexp)

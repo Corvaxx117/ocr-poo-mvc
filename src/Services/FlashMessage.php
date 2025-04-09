@@ -8,20 +8,7 @@ class FlashMessage
     const SUCCESS = 'success';
     const WARNING = 'warning';
 
-    // public static array $message = [];
-    // self::$message[$type][] = $message;
-
-    /**
-     * Démarre la session si elle n'est pas déjà active.
-     * @static 
-     * @return void
-     */
-    private function initSession(): void
-    {
-        if (session_status() === PHP_SESSION_NONE) {
-            session_start();
-        }
-    }
+    public static array $message = [];
 
     /**
      * Ajoute un message flash à la session.
@@ -31,9 +18,7 @@ class FlashMessage
      */
     public function addFlash(string $type, string $message): void
     {
-        self::initSession();
-        $_SESSION['flash_messages'][$type][] = $message;
-        // self::$message[$type][] = $message;
+        self::$message[$type][] = $message;
     }
 
     /**
@@ -43,13 +28,9 @@ class FlashMessage
      */
     public function getFlash(string $type): array
     {
-        self::initSession();
-        $messages = $_SESSION['flash_messages'][$type] ?? [];
-        unset($_SESSION['flash_messages'][$type]);
+        $messages = self::$message[$type] ?? [];
+        unset(self::$message[$type]);
         return $messages;
-        // $messages = self::$message[$type] ?? [];
-        // unset(self::$message[$type]);
-        // return $messages;
     }
 
     /**
@@ -59,9 +40,7 @@ class FlashMessage
      */
     public function hasFlash(string $type): bool
     {
-        self::initSession();
-        return !empty($_SESSION['flash_messages'][$type]);
-        // return !empty(self::$message[$type]);
+        return !empty(self::$message[$type]);
     }
 
     /**
@@ -70,9 +49,7 @@ class FlashMessage
      */
     public function clearFlash(): void
     {
-        self::initSession();
-        unset($_SESSION['flash_messages']);
-        // self::$message = [];
+        self::$message = [];
     }
 
     /**
@@ -81,7 +58,6 @@ class FlashMessage
      */
     public function renderFlash(): void
     {
-        self::initSession();
         $flashTypes = [
             self::ERROR => 'danger',
             self::SUCCESS => 'success',
