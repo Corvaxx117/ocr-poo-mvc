@@ -9,21 +9,17 @@ routes:
     callable: App\Controller\HomeController
 
   # Route Authentication
-  # Affichage formulaire d'inscription
-  "/auth/registrationForm":
-    method: GET
-    callable: App\Controller\AuthController::displayRegistrationForm
   # Inscription
   "/auth/registration":
-    method: POST
+    method:
+      - POST
+      - GET
     callable: App\Controller\AuthController::register
-  # Formulaire de connexion
-  "/auth/connectionForm":
-    method: GET
-    callable: App\Controller\AuthController::displayConnectionForm
   # Connexion
   "/auth/connection":
-    method: POST
+    method:
+      - POST
+      - GET
     callable: App\Controller\AuthController::connect
   # Deconnexion
   "/auth/disconnect":
@@ -53,21 +49,17 @@ routes:
   "/admin":
     method: GET
     callable: App\Controller\AdminController::showAdmin
-  # Formulaire d'ajout d'un article
-  "/admin/formArticle":
-    method: GET
-    callable: App\Controller\AdminController::displayArticleForm
-  # Formulaire de modification d'un article
-  "/admin/formArticle/:id":
-    method: GET
-    callable: App\Controller\AdminController::displayArticleForm
   # Ajouter un article
   "/admin/addArticle":
-    method: POST
+    method:
+      - POST
+      - GET
     callable: App\Controller\AdminController::addArticle
   # Modifier un article
   "/admin/edit/:id":
-    method: POST
+    method:
+      - POST
+      - GET
     callable: App\Controller\AdminController::editArticle
   # Supprimer un article
   "/admin/delete/:id":
