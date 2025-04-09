@@ -5,6 +5,7 @@
  * Il affiche également un formulaire pour ajouter un commentaire. -->
  */
 ?>
+
 <!-- boutons retour et gestion article -->
 <div class="container-over-links">
     <?php if ($this->isAdmin()): ?>
@@ -16,7 +17,7 @@
     <?php endif; ?>
     <div class="link-group">
         <?php if ($this->isAdmin()): ?>
-            <a href="<?= $this->url('/admin/formArticle/' . $article['id']) ?>" class="linkBack">&#9998; Éditer &#9998;</a>
+            <a href="<?= $this->url('/admin/edit/' . $article['id']) ?>" class="linkBack">&#9998; Éditer &#9998;</a>
             <form class="form-actions" method="POST" action="<?= $this->url('/admin/delete/:id', ['id' => $article['id']]) ?>" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet article ?');">
                 <button type="submit" class="linkBack link-delete"><i class="fa-solid fa-trash"></i> Supprimer
                     <i class="fa-solid fa-trash"></i>
@@ -64,6 +65,7 @@
                     <!-- Bouton supprimer, visible uniquement si admin -->
                     <?php if ($this->isAdmin()): ?>
                         <form class="delete-form tooltip" data-tooltip="Supprimer ce commentaire" method="POST" action="<?= $this->url('/comment/delete/:id', ['id' => $comment['id']]) ?>" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?');">
+                            <!-- <input type="hidden" name="id_article" value="<?= $article['id'] ?>"> -->
                             <button class="delete-comment" type="submit">x</button>
                         </form>
                     <?php endif; ?>

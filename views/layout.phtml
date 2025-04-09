@@ -32,10 +32,10 @@ $this->initSession();
             <!-- Si on est connecté, on affiche le bouton de déconnexion, sinon, on affiche le bouton de connexion : -->
             <?php if ($this->isAuthenticated()): ?>
                 <a class="hover-link" href="<?= $this->url('/users/profile') ?>">Mon profil</a>
-                <a class="hover-link" href="<?= $this->url('/auth/disconnect') ?>">Déconnexion</a>
+                <a class="hover-link" href="<?= $this->url('/auth/disconnect') ?>" onclick="return confirm('Etes-vous sur de vouloir vous déconnecter ?')">Déconnexion</a>
             <?php else: ?>
-                <a class="hover-link" href="<?= $this->url('/auth/connectionForm') ?>">Connexion</a>
-                <a class="hover-link" href="<?= $this->url('/auth/registrationForm') ?>">Inscription</a>
+                <a class="hover-link" href="<?= $this->url('/auth/connection') ?>">Connexion</a>
+                <a class="hover-link" href="<?= $this->url('/auth/registration') ?>">Inscription</a>
             <?php endif ?>
         </nav>
         <h1>Emilie Forteroche</h1>
@@ -43,7 +43,6 @@ $this->initSession();
     </header>
     <!-- Affichage des messages error, success et warning -->
     <?php $this->renderFlash(); ?>
-
     <main class="main-content">
         <?php include $template; ?>
     </main>

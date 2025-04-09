@@ -7,7 +7,7 @@
 ?>
 
 <div class="connection-form">
-    <form action="<?= $this->url('/auth/registration') ?>" method="post" class="foldedCorner">
+    <form action="" method="post" class="foldedCorner">
         <h2>Inscription</h2>
         <div class="formGrid">
             <label for="nickname">Pseudonyme</label>
@@ -21,8 +21,9 @@
 
             <label for="confirm_password">Confirmez le mot de passe</label>
             <input type="password" name="confirm_password" id="confirm_password" required>
-
-            <button class="submit">S'inscrire</button>
         </div>
+        <hr>
+        <span> J'ai lu et accepte les <a href="#">conditions d'utilisation</a></span>
+        <button class="submit">S'inscrire</button>
     </form>
 </div>

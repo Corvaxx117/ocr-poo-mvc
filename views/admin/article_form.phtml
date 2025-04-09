@@ -22,6 +22,8 @@
         <input type="hidden" name="action" value="updateArticle">
         <input type="hidden" name="id" value="<?= isset($article) && $article ? $article['id'] : '' ?>">
 
+        <input type="hidden" name="form_token" value="<?= uniqid('', true); ?>">
+
         <button class="submit"><?= isset($article) && $article ? "Modifier" : "Ajouter" ?></button>
     </div>
 </form>

@@ -1,0 +1,17 @@
+<?php
+
+/**
+ * Template de redirection après une action avec affichage des flash messages
+ */
+?>
+
+<div class="redirect-container">
+    <?php $this->renderFlash(); ?>
+    <p>Redirection en cours...</p>
+</div>
+
+<script>
+    setTimeout(() => {
+        window.location.href = "<?= htmlspecialchars($redirectUrl) ?>";
+    }, 2000);
+</script>

@@ -10,7 +10,7 @@
     <form action="<?= $this->url('/auth/connection') ?>" method="post" class="foldedCorner">
         <h2>Connexion</h2>
         <div class="formGrid">
-            <label for="email">email</label>
+            <label for="email" value="<?= $this->clean($_POST['email'] ?? '', false) ?>">email</label>
             <input type="email" name="email" id="email" required>
             <label for="password">Mot de passe</label>
             <input type="password" name="password" id="password" required>

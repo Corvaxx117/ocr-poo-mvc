@@ -1,7 +1,7 @@
 <?php
 
-/** 
- * Affichage de la partie admin : liste des articles sous forme de tableau avec un bouton "voir", "modifier" et "supprimer"pour chacun. 
+/**
+ * Affichage de la partie admin : liste des articles sous forme de tableau avec un bouton "voir", "modifier" et "supprimer" pour chacun. 
  * Il est possible de trier les articles par titre, nombre de vues, nombre de commentaires ou date de sortie.
  * Et un lien vers le formulaire pour ajouter un article. 
  */
@@ -12,7 +12,7 @@
 
 <!-- Bouton Ajouter un article -->
 <div class="admin-add-article">
-    <a class="btn-add" href="<?= $this->url('/admin/formArticle') ?>">
+    <a class="btn-add" href="<?= $this->url('/admin/addArticle') ?>">
         <i class="fa-solid fa-plus" style="font-size: 1em"></i> Ajouter un article <i class="fa-solid fa-plus" style="font-size: 1em"></i></a>
 </div>
 <table class="article-table">
@@ -38,7 +38,7 @@
                         <a class="btn-action btn-view tooltip" data-tooltip="Voir l'article" href="<?= $this->url('/articles/show/:id', ['id' => $article['id']]) ?>">
                             <i class="fa-regular fa-eye"></i>
                         </a>
-                        <a class="btn-action btn-edit tooltip" data-tooltip="Modifier l'article" href="<?= $this->url('/admin/formArticle/:id', ['id' => $article['id']]) ?>">
+                        <a class="btn-action btn-edit tooltip" data-tooltip="Modifier l'article" href="<?= $this->url('/admin/edit/:id', ['id' => $article['id']]) ?>">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </a>
                         <button type="submit" class="btn-action btn-delete tooltip" data-tooltip="Supprimer l'article">
