@@ -43,26 +43,26 @@ class Launcher
      */
     public function run(): void
     {
-        // try {
-        $method = $_SERVER['REQUEST_METHOD'];
+        try {
+            $method = $_SERVER['REQUEST_METHOD'];
 
-        // Astuce php qui permet de traiter la partie de l'url qui nous interresse 
-        // On detecte le fichier index.php et on en extrait le chemin
-        // Si l'URL est http://localhost/public/index.php/news, $basePath devient /public/
-        $basePath = str_replace('index.php', '', $_SERVER['SCRIPT_NAME']);
-        // dans $basePath on va avoir le chemin vers le fichier index.php
-        // On utilise ce basePath pour le retirer 
-        // Il ne restera que ce qui suit le public/ Exemple : /news.
-        $requestUri = '/' . trim(substr($_SERVER['REQUEST_URI'], strlen($basePath)), '/');
-        // Extrait le chemin sans les paramètres Exemple : /news si l'URL est /news?id=123
-        $uri = parse_url($requestUri, PHP_URL_PATH);
+            // Astuce php qui permet de traiter la partie de l'url qui nous interresse 
+            // On detecte le fichier index.php et on en extrait le chemin
+            // Si l'URL est http://localhost/public/index.php/news, $basePath devient /public/
+            $basePath = str_replace('index.php', '', $_SERVER['SCRIPT_NAME']);
+            // dans $basePath on va avoir le chemin vers le fichier index.php
+            // On utilise ce basePath pour le retirer 
+            // Il ne restera que ce qui suit le public/ Exemple : /news.
+            $requestUri = '/' . trim(substr($_SERVER['REQUEST_URI'], strlen($basePath)), '/');
+            // Extrait le chemin sans les paramètres Exemple : /news si l'URL est /news?id=123
+            $uri = parse_url($requestUri, PHP_URL_PATH);
 
-        // Résoudre la route
-        $route = $this->router->match($uri, $method);
+            // Résoudre la route
+            $route = $this->router->match($uri, $method);
 
-        call_user_func_array($route['callable'], $route['params']);
-        // } catch (\Throwable $e) {
-        //     $this->errorHandler->handle($e);
-        // }
+            call_user_func_array($route['callable'], $route['params']);
+        } catch (\Throwable $e) {
+            $this->errorHandler->handle($e);
+        }
     }
 }
