@@ -22,6 +22,7 @@ class Launcher
         $this->errorHandler = new ErrorHandler();
         $this->router = new Router($routesFile);
 
+        $this->errorHandler = new ErrorHandler();
         // Configurer un gestionnaire global pour les exceptions non capturées
         set_exception_handler([$this->errorHandler, 'handle']);
     }

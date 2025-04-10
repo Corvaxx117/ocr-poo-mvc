@@ -49,6 +49,13 @@ class ViewRenderer
         }
         return ($this->$name)(...$arguments);
     }
+    /**
+     * @param string $view
+     * @param array $data
+     * @param int $statusCode
+     * @throws \RuntimeException
+     * @return void
+     */
     public function render(string $view, array $data = [], int $statusCode = 200): void
     {
         // Défini le code HTTP

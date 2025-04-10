@@ -13,19 +13,13 @@ use Symfony\Component\Yaml\Yaml;
 use App\Exceptions\NotFoundException;
 use App\Exceptions\InternalServerErrorException;
 
-use function PHPUnit\Framework\assertIsArray;
-
 class Router
 {
     private array $routes;
-    // private ErrorHandler $errorHandler;
 
     public function __construct(string $routesFile)
     {
         $this->routes = Yaml::parseFile($routesFile)['routes'];
-        // $this->errorHandler = new ErrorHandler();
-        // // Configurer un gestionnaire global pour les exceptions non capturées
-        // set_exception_handler([$this->errorHandler, 'handle']);
     }
 
     public function match(string $uri, string $method)
@@ -37,6 +31,7 @@ class Router
             // '/' est un délimiteur en regexp, on échappe donc '/' par '\/' grace a str_replace
             $pattern = preg_replace('/:\w+/', '(\w+)', str_replace('/', '\/', $route));
 
+            // Permet d'accepter plusieurs methodes
             if (is_array($config['method'])) {
                 $routeMethods = $config['method'];
             } else {
@@ -61,7 +56,6 @@ class Router
                 } else {
                     throw new InternalServerErrorException("Le controller {$route['callable']} n'existe pas");
                 }
-                // dd($route, $uri, $config, $pattern, $matches);
                 // si une route est matchée on retourne donc un array structuré qui va nous être utile pour appeler le bon controller avec les bons arguments
                 return ['callable' => $callable, 'params' => $matches];
             }
