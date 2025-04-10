@@ -6,7 +6,7 @@
 routes:
   "/":
     method: GET
-    callable: App\Controller\HomeController
+    callable: App\Controller\ArticleController::listAllArticles
 
   # Route Authentication
   # Inscription
